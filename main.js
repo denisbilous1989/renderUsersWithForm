@@ -238,9 +238,33 @@ function createCard(tagName, innerHTML, classNames, parent) {
   classNames.forEach(function (className) {
     el.classList.add(className);
   })
-  
+
   parent.append(el);
 };
+
+function hoverRemoveChekCard(tagName) {
+  tagName.addEventListener('mouseover', function () {
+    this.querySelector('.remove').style.display = 'block'
+  })
+
+  tagName.addEventListener('mouseout', function () {
+    this.querySelector('.remove').style.display = 'none'
+  })
+
+  tagName.addEventListener('click', function () {
+    this.classList.toggle('active')
+  })
+
+  const remove = tagName.querySelectorAll('.remove');
+
+  remove.forEach(function (el) {
+
+    el.addEventListener('click', function () {
+      tagName.parentNode.removeChild(tagName);
+
+    })
+  })
+}
 
 
 
@@ -248,22 +272,6 @@ let form = document.querySelector('.form');
 let formInputs = document.querySelectorAll('.input');
 
 
-// form.onsubmit = function (event) { 
-//   event.preventDefault();
-
-//   formInputs.forEach(function (input) {
-
-//     createCard('p', '<b>' + 'Name: ' + '</b>' + '<h2>' + input.value + '</h2>', ['card__name'], div);
-
-//     if(input.value === '') {
-//       input.classList.add('error');
-//     } else {
-//       input.classList.remove('error');
-//     }
-//   })
-
-//   return false;
-// }
 
 function renderUsers(data) {
 
@@ -274,43 +282,57 @@ function renderUsers(data) {
   let formInputs = document.querySelectorAll('.input');
 
 
-  form.onsubmit = function (event) { 
-  event.preventDefault();
-  console.log(formInputs);
+  form.onsubmit = function (event) {
+    event.preventDefault();
+    
 
-  
-  for(const input of formInputs){
-    if(input.value === '') {
+    let hasError = false
 
-      input.classList.add('error');
 
-    } else {
+    for(const input of formInputs){
+      if(input.value === '') {
+        hasError = true
+        input.classList.add('error');
 
-      input.classList.remove('error');
+      } else {
+
+        input.classList.remove('error');
+      }
     }
+
+    if (!hasError) {
+      console.log(event.target);
+      const li = document.createElement('li');
+      li.classList.add('cards-item');
+      ul.append(li);
+
+      const div = document.createElement('div');
+      div.classList.add('card');
+
+      createCard('p', '<b>' + 'Name: ' + '</b>' + '<h2>' + form.elements[0].value + '</h2>', ['card__name'], div);
+      createCard('p', '<b>' + 'User Name: ' + '</b>' + '<h3>' + form.elements[1].value + '</h3>', ['card__username'], div);
+      createCard('p', '<b>' + 'Email: ' + '</b>' + form.elements[2].value, ['card__email'], div);
+
+      createCard('a', '<b>' + 'Phone: ' + '</b>' + form.elements[3].value, ['card__phone'], div);
+      createCard('a', '<b>' + 'Website: ' + '</b>' + form.elements[4].value, ['card__website'], div);
+
+      li.append(div);
+
+      createCard('span', 'REMOVE', ['remove'], li);
+
+      hoverRemoveChekCard(li);
+
+      alert('Новый пользователь добавлен в список')
+
+    }
+    
+    event.target.reset();
+
+    return false;
   }
 
-  const li = document.createElement('li');
-  li.classList.add('cards-item');
-  ul.append(li);
-
-  const div = document.createElement('div');
-  div.classList.add('card');
-
-createCard('p', '<b>' + 'Name: ' + '</b>' + '<h2>' + form.elements[0].value + '</h2>', ['card__name'], div);
-createCard('p', '<b>' + 'User Name: ' + '</b>' + '<h3>' + form.elements[1].value + '</h3>', ['card__username'], div);
-createCard('p', '<b>' + 'Email: ' + '</b>' + form.elements[2].value, ['card__email'], div);
-
-createCard('a', '<b>' + 'Phone: ' + '</b>' + form.elements[3].value, ['card__phone'], div);
-createCard('a', '<b>' + 'Website: ' + '</b>' + form.elements[4].value, ['card__website'], div);
-
-li.append(div);
-
-return false;
-}
-
   data.forEach(user => {
-    
+
     const li = document.createElement('li');
     li.classList.add('cards-item');
     ul.append(li);
@@ -325,39 +347,17 @@ return false;
 
     createCard('a', '<b>' + 'Phone: ' + '</b>' + user.phone, ['card__phone'], div);
     createCard('a', '<b>' + 'Website: ' + '</b>' + user.website, ['card__website'], div);
-    
+
 
     li.append(div);
 
     createCard('span', 'REMOVE', ['remove'], li);
 
-    li.addEventListener('mouseover', function () {
-      this.querySelector('.remove').style.display = 'block'
-    })
+    hoverRemoveChekCard(li);
 
-    li.addEventListener('mouseout', function () {
-      this.querySelector('.remove').style.display = 'none'
-    })
-
-    li.addEventListener('click', function () {
-      this.classList.toggle('active')
-    })
-
-    const remove = li.querySelectorAll('.remove');
-
-    remove.forEach(function (el) {
-
-      el.addEventListener('click', function () {
-        li.parentNode.removeChild(li);
-        
-      })
-    })
-    
   });
 
   return ul;
 }
-
-
 
 document.querySelector('.container').append(renderUsers(users));
